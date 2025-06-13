@@ -74,7 +74,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
 5. **Launch a Jupyter Lab Server Within a Containerized Conda Environment**
 
-    This step launches your Conda environment inside a Singularity container and starts a Jupyter Lab kernel server inside it. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts a Jupyter Lab session.
+    This step launches your Conda environment inside a Singularity container and starts an [IPython](https://ipython.org/) kernel server inside it. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts a Jupyter Lab session.
 
     Update the configuration variables to reflect your own file paths and environment name, then paste and run in the compute node you were dropped into in the last step.
 
