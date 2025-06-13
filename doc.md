@@ -56,7 +56,9 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     After logging in to the Greene cluster, you’ll need to request an interactive session on a compute node — a dedicated machine where your code will run. In your terminal (still connected to `greene-login`), cut and paste this:
 
-    `srun --partition=short --pty --gres=gpu:0 --mem=32G --cpus-per-task=4 --time=01:00:00 bash`
+    ```
+    srun --partition=short --pty --gres=gpu:0 --mem=32G --cpus-per-task=4 --time=01:00:00 bash
+    ```
 
     This command requests:
     * `partition=short` – a short-duration partition
