@@ -68,13 +68,15 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     * `cpus-per-task=4` – 4 CPU cores
     * `time=01:00:00` – a maximum runtime of 1 hour
 
-    You’ll be dropped into a shell on an assigned compute node. To confirm the name of your current node, you can run `hostname` at your Terminal prompt. You'll see something like `cm026.hpc.nyu.edu`.
+    You can change your the flags in this command to request more time, memory, CPUs, a GPU.
+    
+    After resources are allocated (which can take time), you’ll be dropped into a shell on one of Greene's compute nodes. To confirm the name of your assigned node, you can run `hostname` at your Terminal prompt. You'll see something like `cm026.hpc.nyu.edu`.
 
 5. **Launch a Jupyter Lab Server Within a Containerized Conda Environment**
 
     This step launches your Conda environment inside a Singularity container and starts a Jupyter Lab kernel server inside it. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts a Jupyter Lab session.
 
-    Update the configuration variables to reflect your own file paths and environment name, the past and run in the compute node you were dropping into in the last step.
+    Update the configuration variables to reflect your own file paths and environment name, then paste and run in the compute node you were dropped into in the last step.
 
     ```
     # === Configuration ===
