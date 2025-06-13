@@ -48,7 +48,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     Open a Terminal window on your local machine and connect to the Greene login node using the SSH alias you configured earlier:
 
-    `ssh greene-login`
+    ```ssh greene-login```
 
 4. **Request Resources on a Compute Node**
 
