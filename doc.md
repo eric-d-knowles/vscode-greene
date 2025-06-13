@@ -4,7 +4,7 @@ New York University’s High-Performance Computing (HPC) facility offers browser
 
 This approach to code development offers many advantages, including seamless access to Greene‘s full range of [computing resources](https://www.nyu.edu/research/navigating-research-technology/nyu-greene.html). Nevertheless, browser-based coding has downsides. OnDemand limits users‘ choice of computing environments and restricts the installation of smart coding tools like AI-assisted code completion and AI copilots.
 
-For users who want more flexibility, there are benefits to coding in a fully featured and extensible _local_ Integrated Development Environment (IDE) such as [Visual Studio Code](https://code.visualstudio.com) (VS Code). VS Code allows you to edit and run Jupyter notebooks while not remaining tied to the Jupyter Lab interface.
+For users who want more flexibility, there are benefits to coding in a fully featured and extensible _local_ Integrated Development Environment (IDE) such as [Visual Studio Code](https://code.visualstudio.com) (VS Code). VS Code allows you to edit and run Jupyter notebooks while not remaining tied to the Jupyter Notebook or Lab interfaces.
 
 Fortunately, moving code development to your personal laptop or desktop does not mean giving up direct access to Greene’s computing resources. By linking a local IDE to the Greene cluster, you can take advantage of advanced tools and extensions — including AI features — while still running your code on powerful remote hardware.
 
@@ -95,4 +95,8 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     "
     ```
 
-    The Jupyter server will act as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
+    The Jupyter server acts as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
+
+6. **Editing Your SSH Configuration to Reference Your Assigned Compute Node**
+
+    Next, edit your `~/.ssh/config` file to specify the compute node you've been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the placeholder node specification with `HostName cm026.hpc.nyu.edu`.
