@@ -4,7 +4,7 @@ New York University’s High-Performance Computing (HPC) facility offers browser
 
 This approach to code development offers many advantages, including seamless access to Greene‘s full range of [computing resources](https://www.nyu.edu/research/navigating-research-technology/nyu-greene.html). Nevertheless, browser-based coding has downsides. OnDemand limits users‘ choice of computing environments and restricts the installation of smart coding tools like AI-assisted code completion and AI copilots.
 
-For users who want more flexibility, there are benefits to coding in a fully featured and extensible _local_ Integrated Development Environment (IDE) such as [Visual Studio Code](https://code.visualstudio.com) (VS Code).
+For users who want more flexibility, there are benefits to coding in a fully featured and extensible _local_ Integrated Development Environment (IDE) such as [Visual Studio Code](https://code.visualstudio.com) (VS Code). VS Code allows you to edit and run Jupyter notebooks while not remaining tied to the Jupyter Lab interface.
 
 Fortunately, moving code development to your personal laptop or desktop does not mean giving up direct access to Greene’s computing resources. By linking a local IDE to the Greene cluster, you can take advantage of advanced tools and extensions — including AI features — while still running your code on powerful remote hardware.
 
@@ -74,7 +74,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
 5. **Launch a Jupyter Lab Server Within a Containerized Conda Environment**
 
-    This step launches your Conda environment inside a Singularity container and starts an [IPython](https://ipython.org/) kernel server inside it. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts a Jupyter Lab session.
+    This step launches your Conda environment inside a Singularity container and starts an Jupyter Lab server inside it. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts a Jupyter Lab server.
 
     Update the configuration variables to reflect your own file paths and environment name, then paste and run in the compute node you were dropped into in the last step.
 
@@ -95,4 +95,4 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     "
     ```
 
-    Even though we're planning to work in VS Code, launching a Jupyter Lab server inside the container is necessary because VS Code connects to Jupyter kernels through the Jupyter protocol. The Jupyter server acts as a bridge between your local editor and the remote Python kernel running inside the Singularity container.
+    The Jupyter server will act as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
