@@ -68,7 +68,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     * `cpus-per-task=4` – 4 CPU cores
     * `time=01:00:00` – a maximum runtime of 1 hour
 
-    You can change your the flags in this command to request more time, memory, CPUs, a GPU.
+    You can change the flags in this command to request more time, memory, CPUs, a GPU.
     
     After resources are allocated (which can take time), you’ll be dropped into a shell on one of Greene's compute nodes. To confirm the name of your assigned node, you can run `hostname` at your Terminal prompt. You'll see something like `cm026.hpc.nyu.edu`.
 
