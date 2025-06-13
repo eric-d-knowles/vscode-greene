@@ -97,6 +97,14 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     The Jupyter server acts as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
 
-6. **Editing Your SSH Configuration to Reference Your Assigned Compute Node**
+6. **Edit Your SSH Configuration to Reference Your Assigned Compute Node**
 
-    Next, edit your `~/.ssh/config` file to specify the compute node you've been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the placeholder node specification with `HostName cm026.hpc.nyu.edu`.
+    Next, edit your `~/.ssh/config` file to specify the compute node you've been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the placeholder host name with `HostName cm026.hpc.nyu.edu`.
+
+7. **Forward the Local Port to the Remote Port**
+
+    Once you've updated your SSH configuration to specify the right compute node, you must forward local port `8888` to remote port `8888`. This provides a secure way for your local machine to "listen" to Jupyter served launched inside the remote Singularity container. Run this
+
+    ```
+    ssh -N -L 8888:localhost:8888 greene-compute
+    ```
