@@ -18,10 +18,6 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     You’ll need to be on NYU’s network ([NYU-NET](https://www.nyu.edu/life/information-technology/infrastructure/network-services/nyu-net.html)). If you‘e on a campus wired or WiFi connection, you’re on NYU-NET already. If you‘re off campus, you must connect through NYU's VPN using the [Cisco AnyConnect software client](https://www.nyu.edu/life/information-technology/infrastructure/network-services/vpn.html).
 
-    ```
-    ssh greene-login
-    ```
-
 2. **Configure SSH**
 
     Set up a Secure Shell (SSH) configuration on your local machine by adding the entries below to your `~/.ssh/config` file. Don't forget to replace `<NetID>` with your actual NetID.
@@ -52,7 +48,9 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     Open a Terminal window on your local machine and connect to the Greene login node using the SSH alias you configured earlier:
 
-    `ssh greene-login`
+    ```
+    ssh greene-login
+    ```
 
 4. **Request Resources on a Compute Node**
 
