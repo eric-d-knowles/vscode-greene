@@ -1,6 +1,6 @@
 # Remote Development on NYU HPC’s Greene Cluster
 
-New York University’s High-Performance Computing (HPC) facility offers browser-based access to Jupyter Notebook, Jupyter Lab, and other applications through the [OnDemand service](https://sites.google.com/nyu.edu/nyu-hpc/accessing-hpc#h.7kawz2pfzl9d). With OnDemand, you don't work with Python notebooks on your personal computer; you write and execute code on a server-side Jupyter instance through your web browser.
+New York University’s High-Performance Computing (HPC) facility offers browser-based access to Jupyter Notebook, Jupyter Lab, and other applications through the [OnDemand service](https://sites.google.com/nyu.edu/nyu-hpc/accessing-hpc#h.7kawz2pfzl9d). With OnDemand, you don't work with Python notebooks on your personal computer, but rather on a server-side Jupyter instance through your web browser.
 
 This approach to code development offers many advantages, including seamless access to Greene‘s full range of [computing resources](https://www.nyu.edu/research/navigating-research-technology/nyu-greene.html). Nevertheless, browser-based coding has downsides. OnDemand limits users‘ choice of computing environments and restricts the installation of smart coding tools like AI-assisted code completion and AI copilots.
 
