@@ -90,7 +90,11 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     "${CONTAINER_PATH}" \
     bash -c "
         source /ext3/env.sh
-        conda activate '${CONDA_ENV_NAME}'
+        conda activate \"${CONDA_ENV_NAME}\"
+        pip install --quiet ipykernel
+        python -m ipykernel install --user \
+        --name \"${CONDA_ENV_NAME}\" \
+        --display-name \"Remote kernel: ${CONDA_ENV_NAME}\"
         jupyter lab --no-browser --port=8888 --ip=0.0.0.0
     "
     ```
