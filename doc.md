@@ -72,7 +72,13 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     
     After resources are allocated (which can take time), you’ll be dropped into a shell on one of Greene's compute nodes. To confirm the name of your assigned node, you can run `hostname` at your Terminal prompt. You'll see something like `cm026.hpc.nyu.edu`.
 
-5. **Launch a Jupyter Lab Server Within a Containerized Conda Environment**
+5. **Edit Your SSH Configuration to Reference Your Assigned Compute Node**
+
+    Next, edit your `~/.ssh/config` file to specify the compute node you've been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the placeholder with `cm026.hpc.nyu.edu`.
+    
+    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. This file lives on your local machine and you won't be able to find it through the compute node window opened in the last step!
+
+6. **Launch a Jupyter Lab Server Within a Containerized Conda Environment**
 
     This step launches your Conda environment inside a Singularity container and starts an Jupyter Lab server inside it. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts a Jupyter Lab server.
 
@@ -112,20 +118,28 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     The Jupyter server acts as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
 
-6. **Edit Your SSH Configuration to Reference Your Assigned Compute Node**
+    One part the output is crucial. It will look something like this:
 
-    Next, edit your `~/.ssh/config` file to specify the compute node you've been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the placeholder with `cm026.hpc.nyu.edu`.
-    
-    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. This file lives on your local machine and you won't be able to find it through the compute node window opened in the last step!
+    ```
+    To access the server, open this file in a browser:
+        file:///home/edk202/.local/share/jupyter/runtime/jpserver-2205529-open.html
+    Or copy and paste one of these URLs:
+        http://cm005.hpc.nyu.edu:8889/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
+        http://127.0.0.1:8889/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
+    ```
+
+    The last line is what we need. The URL as a whole is what we'll use to access the Jupyter kernel in VS Code. But before that, we need to ensure that your local machine is listening to the compute node on the right port. That port is listed after the colon in the first part of the URL — in this example, it's 8889.
 
 7. **Forward the Local Port to the Remote Port**
 
-    Once you've updated your SSH configuration to specify the right compute node, you must forward local port `8888` to remote port `8888`. This provides a secure way for your local machine to "listen" to Jupyter served launched inside the remote Singularity container.
+    You must now forward local port `8888` to the remote port you find in the Jupyter URL. This provides a secure way for your local machine to "listen" to the Jupyter server you just launched inside the remote Singularity container.
 
-    After to you run this command, not output will be printed and the window will appear to hang. This is normal; your local machine is listening.
+    If the remote port is `8889`, you would use this command to get your local machine to listen to the compute:
 
     ```
-    ssh -N -L 8888:localhost:8888 greene-compute
+    ssh -N -L 8888:localhost:8889 greene-compute
     ```
+
+    After to you run this command, no output will be printed and the window will appear to hang. This is normal; your local machine is listening.
 
     **Note:** This command needs to be executed on your local machine, so be sure to run it in a new Terminal window; it won't work in the compute node window.
