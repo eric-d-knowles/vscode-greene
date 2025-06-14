@@ -4,7 +4,7 @@ New York University’s High-Performance Computing (HPC) facility offers browser
 
 This approach to code development offers many advantages, including seamless access to Greene‘s full range of [computing resources](https://www.nyu.edu/research/navigating-research-technology/nyu-greene.html). Nevertheless, browser-based coding has downsides. OnDemand limits users‘ choice of computing environments and restricts the installation of smart coding tools like AI-assisted code completion and AI copilots.
 
-For users who want more flexibility, there are benefits to coding in a fully featured and extensible _local_ Integrated Development Environment (IDE) such as [Visual Studio Code](https://code.visualstudio.com) (VS Code). VS Code allows you to edit Jupyter notebooks outside the traditional Jupyter ecosystem.
+For users who want more flexibility, there are benefits to coding in a fully featured and extensible _local_ Integrated Development Environment (IDE) such as [Visual Studio Code](https://code.visualstudio.com) (VS Code). VS Code allows you to edit Jupyter notebooks outside of the traditional Jupyter ecosystem.
 
 Fortunately, moving code development to your personal laptop or desktop does not mean giving up direct access to Greene’s computing resources. By linking a local IDE to the Greene cluster, you can take advantage of advanced tools and extensions — including AI features — while still running your code on powerful remote hardware.
 
