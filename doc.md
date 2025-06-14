@@ -118,7 +118,9 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     The Jupyter server acts as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
 
-    One part the output is crucial. It will look something like this:
+7. **Get Port Number and URL from Jupyter Server Output**
+
+    One part the output of the Jupyter server command is crucial. It will look something like this:
 
     ```
     To access the server, open this file in a browser:
@@ -128,9 +130,9 @@ Note that the guide assumes familiarity with Singularity containers and conda en
         http://127.0.0.1:8889/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
     ```
 
-    The last line is what we need. The URL as a whole is what we'll use to access the Jupyter kernel in VS Code. But before that, we need to ensure that your local machine is listening to the compute node on the right port. That port is listed after the colon in the first part of the URL — in this example, it's 8889.
+    The last line is what we need. The URL as a whole is what we'll use to access the Jupyter kernel in VS Code. But before that, we need to ensure that your local machine is listening to the compute node on the right port. That port is listed after the colon in the first part of the URL — in this example, it's `8889`.
 
-7. **Forward the Local Port to the Remote Port**
+8. **Forward the Local Port to the Remote Port**
 
     You must now forward local port `8888` to the remote port you find in the Jupyter URL. This provides a secure way for your local machine to "listen" to the Jupyter server you just launched inside the remote Singularity container.
 
