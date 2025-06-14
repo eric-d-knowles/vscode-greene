@@ -84,6 +84,17 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     CONTAINER_PATH="/scratch/work/public/singularity/cuda12.6.3-cudnn9.5.1-ubuntu22.04.5.sif"
     CONDA_ENV_NAME="word2gm-fast2"
 
+    # === Jupyter cleanup ===
+    echo "🧹 Cleaning up stale Jupyter runtime files..."
+    rm -f ~/.local/share/jupyter/runtime/nbserver-*.json
+    rm -f ~/.local/share/jupyter/runtime/kernel-*.json
+
+    # If needed, kill lingering jupyter servers
+    if pgrep -u "$USER" -f "jupyter-lab" > /dev/null; then
+        echo "✂️  Killing old JupyterLab processes..."
+        pkill -u "$USER" -f "jupyter-lab"
+    fi
+
     # === Run Singularity command ===
     singularity exec \
     --overlay "${OVERLAY_PATH}:rw" \
