@@ -1,6 +1,6 @@
 # Remote Development on NYU HPC’s Greene Cluster
 
-New York University’s High-Performance Computing (HPC) facility offers browser-based access to Jupyter Notebook, Jupyter Lab, and other applications through the [OnDemand service](https://sites.google.com/nyu.edu/nyu-hpc/accessing-hpc#h.7kawz2pfzl9d). With OnDemand, you run Jupyter notebooks on a remote server rather than on your personal computer. The computations take place on NYU's HPC infrastructure, while you interact with the notebooks through your web browser.
+New York University’s High-Performance Computing (HPC) facility offers browser-based access to Jupyter Notebook, Jupyter Lab, and other applications through the [OnDemand service](https://sites.google.com/nyu.edu/nyu-hpc/accessing-hpc#h.7kawz2pfzl9d). With OnDemand, you run Jupyter notebooks on a remote server rather than on your personal computer. The computations take place on NYU’s HPC infrastructure, while you interact with the notebooks through your web browser.
 
 This approach to code development offers many advantages, including seamless access to Greene’s full range of [computing resources](https://www.nyu.edu/research/navigating-research-technology/nyu-greene.html). Nevertheless, browser-based coding has downsides. OnDemand limits users’ choice of computing environments and restricts the installation of smart coding tools like AI-assisted code completion and AI copilots.
 
@@ -10,17 +10,17 @@ Fortunately, moving code development to your personal laptop or desktop does not
 
 This guide walks through the process of configuring VS Code to connect to Greene, affording you full control over your development environment without sacrificing computational power.
 
-Note that the guide assumes familiarity with Singularity containers and conda environments — NYU HPC's recommended approach to creating independent and reproducible computing environments. If you’re new to this approach, start [here](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/singularity-with-miniconda) to learn how to create a writable container overlay, install Miniforge, and configure a conda environment inside the container. If you’re interested in using your Singularity setup with the OnDemand web interface, [this guide](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/open-ondemand-ood-with-condasingularity) covers that process.
+Note that the guide assumes familiarity with Singularity containers and conda environments — NYU HPC’s recommended approach to creating independent and reproducible computing environments. If you’re new to this approach, start [here](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/singularity-with-miniconda) to learn how to create a writable container overlay, install Miniforge, and configure a conda environment inside the container. If you’re interested in using your Singularity setup with the OnDemand web interface, [this guide](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/open-ondemand-ood-with-condasingularity) covers that process.
 
 ## Steps to Link VS Code to a Greene Compute Node
 
 1. **Connect to NYU-NET**
 
-    You’ll need to be on NYU’s network ([NYU-NET](https://www.nyu.edu/life/information-technology/infrastructure/network-services/nyu-net.html)). If you’e on a campus wired or WiFi connection, you’re on NYU-NET already. If you’re off campus, you must connect through NYU's VPN using the [Cisco AnyConnect software client](https://www.nyu.edu/life/information-technology/infrastructure/network-services/vpn.html).
+    You’ll need to be on NYU’s network ([NYU-NET](https://www.nyu.edu/life/information-technology/infrastructure/network-services/nyu-net.html)). If you’e on a campus wired or WiFi connection, you’re on NYU-NET already. If you’re off campus, you must connect through NYU’s VPN using the [Cisco AnyConnect software client](https://www.nyu.edu/life/information-technology/infrastructure/network-services/vpn.html).
 
 2. **Configure SSH**
 
-    Set up a Secure Shell (SSH) configuration on your local machine by adding the entries below to your `~/.ssh/config` file. Don't forget to replace `<NetID>` with your actual NetID.
+    Set up a Secure Shell (SSH) configuration on your local machine by adding the entries below to your `~/.ssh/config` file. Don’t forget to replace `<NetID>` with your actual NetID.
 
     ```
     Host greene-login
@@ -42,7 +42,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     The `greene-login` entry uses SSH keys to simplify connection to the Greene login node and avoid repeated password prompts.
 
-    Because computation-heavy code should never be run on a login node, we’re going to request resources on a compute node. The SSH configuration file’s `greene-compute` entry makes it easy to connect to that node once it’s assigned. You’ll update the placeholder `ComputeNode` later to match the node you've been allocated.
+    Because computation-heavy code should never be run on a login node, we’re going to request resources on a compute node. The SSH configuration file’s `greene-compute` entry makes it easy to connect to that node once it’s assigned. You’ll update the placeholder (`<ComputeNode>`) later to match the node you’ve been allocated.
 
 3. **Connect to a Greene Login Node**
 
@@ -70,13 +70,13 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     You can change the flags in this command to request more time, memory, CPUs, or a GPU.
     
-    After resources are allocated (which can take time), you’ll be dropped into a shell on one of Greene's compute nodes. To confirm the name of your assigned node, you can run `hostname` at your Terminal prompt. You'll see something like `cm026.hpc.nyu.edu`.
+    After resources are allocated (which can take time), you’ll be dropped into a shell on one of Greene’s compute nodes. To confirm the name of your assigned node, you can run `hostname` at your Terminal prompt. You’ll see something like `cm026.hpc.nyu.edu`.
 
 5. **Edit Your SSH Configuration to Reference Your Assigned Compute Node**
 
-    Next, edit your `~/.ssh/config` file to specify the compute node you've been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the `<ComputeNode>` placeholder with `cm026.hpc.nyu.edu`.
+    Next, edit your `~/.ssh/config` file to specify the compute node you’ve been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the `<ComputeNode>` placeholder with `cm026.hpc.nyu.edu`.
     
-    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. This file lives on your local machine and you won't be able to find it through the compute node window opened in the last step.
+    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. This file lives on your local machine and you won’t be able to find it through the compute node window opened in the last step.
 
 6. **Launch a Jupyter Lab Server Within a Containerized Conda Environment**
 
@@ -147,10 +147,10 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     ssh -N -L 8888:localhost:8889 greene-compute
     ```
     
-    **Note:** This command needs to be executed on your local machine, so be sure to run it in a new Terminal window; it won't work in the compute node window.
+    **Note:** This command needs to be executed on your local machine, so be sure to run it in a new Terminal window; it won’t work in the compute node window.
 
     After to you run this command, no output will be printed and the window will appear to hang. This is normal; your local machine is listening.
 
 9. **Activate the Kernel in VS Code**
 
-    The next step is to open VS Code and activate the Jupyter kernel you've just set up.
+    The next step is to open VS Code and activate the Jupyter kernel you’ve just set up.
