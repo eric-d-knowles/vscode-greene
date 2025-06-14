@@ -35,14 +35,14 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     LogLevel ERROR
 
     Host greene-compute
-    HostName cm001.hpc.nyu.edu     # Replace with your assigned compute node
+    HostName <ComputeNode>
     User <NetID>
     ProxyJump greene-login
     ```
 
     The `greene-login` entry uses SSH keys to simplify connection to the Greene login node and avoid repeated password prompts.
 
-    Because computation-heavy code should never be run on a login node, we’re going to request resources on a compute node. The `greene-compute` entry makes it easy to connect to that node once it‘s assigned. You’ll update the placeholder `cm001` later based on which specific node you’re allocated.
+    Because computation-heavy code should never be run on a login node, we’re going to request resources on a compute node. The `greene-compute` entry makes it easy to connect to that node once it‘s assigned. You’ll update the placeholder `ComputeNode` later based on which specific node you’re allocated.
 
 3. **Connect to a Greene Login Node**
 
