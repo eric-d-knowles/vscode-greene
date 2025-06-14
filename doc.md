@@ -91,7 +91,12 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     bash -c "
         source /ext3/env.sh
         conda activate '${CONDA_ENV_NAME}'
-        jupyter lab --no-browser --port=8888 --ip=0.0.0.0
+        jupyter lab --no-browser --port=0 --ip=0.0.0.0 > ~/.jupyter/jlab.log 2>&1 &
+        sleep 3
+        remote_port=$(grep -oP 'http://[^:]+:\K[0-9]+' ~/.jupyter/jlab.log | head -n1)
+        echo "🔁 Jupyter launched on remote port: $remote_port"
+        echo "📎 To access it, run this on your local machine:"
+        echo "ssh -N -L 8888:localhost:$remote_port edk202@cm005.hpc.nyu.edu
     "
     ```
 
