@@ -10,7 +10,7 @@ Fortunately, moving code development to your personal laptop or desktop does not
 
 This guide walks through the process of configuring VS Code to connect to Greene, affording you full control over your development environment without sacrificing computational power.
 
-Note that the guide assumes familiarity with Singularity containers and conda environments — NYU HPC's recommended approach to creating fully independent and reproducible computing environments. If you’re new to this approach, start [here](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/singularity-with-miniconda) to learn how to create a writable container overlay, install Miniforge, and configure a conda environment inside the container. If you’re interested in using your Singularity setup with the OnDemand web interface, [this guide](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/open-ondemand-ood-with-condasingularity) covers that process.
+Note that the guide assumes familiarity with Singularity containers and conda environments — NYU HPC's recommended approach to creating independent and reproducible computing environments. If you’re new to this approach, start [here](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/singularity-with-miniconda) to learn how to create a writable container overlay, install Miniforge, and configure a conda environment inside the container. If you’re interested in using your Singularity setup with the OnDemand web interface, [this guide](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/open-ondemand-ood-with-condasingularity) covers that process.
 
 ## Steps to Link VS Code to a Greene Compute Node
 
