@@ -101,12 +101,14 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     Next, edit your `~/.ssh/config` file to specify the compute node you've been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the placeholder with `cm026.hpc.nyu.edu`.
     
-    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. You won't be able to find this file in the compute node window opened in the last step!
+    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. This file lives on your local machine and you won't be able to find it through the compute node window opened in the last step!
 
 7. **Forward the Local Port to the Remote Port**
 
-    Once you've updated your SSH configuration to specify the right compute node, you must forward local port `8888` to remote port `8888`. This provides a secure way for your local machine to "listen" to Jupyter served launched inside the remote Singularity container. Run this
+    Once you've updated your SSH configuration to specify the right compute node, you must forward local port `8888` to remote port `8888`. This provides a secure way for your local machine to "listen" to Jupyter served launched inside the remote Singularity container.
 
     ```
     ssh -N -L 8888:localhost:8888 greene-compute
     ```
+
+    **Note:** This command needs to be executed on your local machine, so be sure to run it in a new Terminal window; it won't work in the compute node window.
