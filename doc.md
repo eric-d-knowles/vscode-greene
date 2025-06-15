@@ -146,7 +146,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     If the remote port is `8888`, you would use this command to get your local machine to listen to the compute node:
 
     ```
-    ssh -f -N -L 8888:localhost:8889 greene-compute
+    ssh -f -N -L 8888:localhost:8888 greene-compute
     ```
     
     **Note:** This command needs to be executed on your local machine, so be sure to run it in a new Terminal window; it won’t work in the compute node window.
