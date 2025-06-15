@@ -114,7 +114,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
         python -m ipykernel install --user \
         --name \"${CONDA_ENV_NAME}\" \
         --display-name \"Remote kernel: ${CONDA_ENV_NAME}\"
-        jupyter --no-browser --port=8888 --ip=0.0.0.0
+        jupyter lab --no-browser --port=8888 --ip=0.0.0.0
     "
     ```
 
