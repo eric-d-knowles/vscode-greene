@@ -82,7 +82,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
 6. **Launch a JupyterLab Server Within a Containerized Conda Environment**
 
-    This step launches your Conda environment inside a Singularity container and starts an JupyterLab server there. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts a JupyterLab server. The Jupyter server acts as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
+    This step launches your Conda environment inside a Singularity container and starts a JupyterLab server there. The command below mounts your writable overlay, activates the specified Conda environment inside the container, and starts the server. The Jupyter server acts as a bridge between VS Code and the remote Python kernel running inside the Singularity container.
 
     Update the configuration variables to reflect your own file paths and environment name, then paste and run the code in the compute node you were dropped into in the last step.
 
@@ -114,7 +114,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
         python -m ipykernel install --user \
         --name \"${CONDA_ENV_NAME}\" \
         --display-name \"Remote kernel: ${CONDA_ENV_NAME}\"
-        JupyterLab --no-browser --port=8888 --ip=0.0.0.0
+        jupyter --no-browser --port=8888 --ip=0.0.0.0
     "
     ```
 
@@ -123,11 +123,11 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     * `conda activate \"${CONDA_ENV_NAME}\"` starts the environment for your project
     * `pip install --quiet ipykernel` installs the [IPython kernel](https://ipython.readthedocs.io/en/stable/install/kernel_install.html) if needed
     * `python -m ipykernel install [...]` registers a new `ipykernel`
-    * `JupyterLab [...]` starts a Jupyter server inside the container
+    * `jupyter [...]` starts a Jupyter server inside the container
 
 7. **Get Port Number and URL from Jupyter Server Output**
 
-    Output from the `JupyterLab` command should appear in the Terminal. The crucial part will look similar to this:
+    Output from the `jupyter` command should appear in the Terminal. The crucial part will look similar to this:
 
     ```
     To access the server, open this file in a browser:
