@@ -133,17 +133,17 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     To access the server, open this file in a browser:
         file:///home/edk202/.local/share/jupyter/runtime/jpserver-2205529-open.html
     Or copy and paste one of these URLs:
-        http://cm005.hpc.nyu.edu:8889/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
-        http://127.0.0.1:8889/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
+        http://cm005.hpc.nyu.edu:8888/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
+        http://127.0.0.1:8888/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
     ```
 
-    The last line is what we need. We’ll use the URL as a whole to access the Jupyter server in VS Code. But before that, we need to ensure that your local machine is listening to the compute node on the right port. That port is listed after the colon in the first part of the URL — in this example `8889`
+    The last line is what we need. We’ll use the URL as a whole to access the Jupyter server in VS Code. But before that, we need to ensure that your local machine is listening to the compute node on the right port. That port is listed after the colon in the first part of the URL — in this example `8888`
 
 8. **Forward the Local Port to the Remote Port**
 
     You must now forward local port `8888` to the remote port you find in the Jupyter URL. This provides a secure way for your local machine to listen to the Jupyter server you just launched inside the remote container.
 
-    If the remote port is `8889`, you would use this command to get your local machine to listen to the compute node:
+    If the remote port is `8888`, you would use this command to get your local machine to listen to the compute node:
 
     ```
     ssh -f -N -L 8888:localhost:8889 greene-compute
