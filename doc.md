@@ -164,6 +164,6 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
 If all goes well, you should now be able to write code in a local instance of VS Code while accessing all the resources you've requested on Greene's compute node!
 
-## Script Automating the Entire Process
+## Automating the Entire Process
 
-It can be helpful to walk through the steps above a few times, as they provide a nice snapshot of how to interact with NYU's Greene cluster. Nonetheless, if you code often in VS Code, it can be tedious to manually set up tunnel to a
+It can be helpful to walk through the steps above a few times, since they provide a nice snapshot of how to interact with NYU's Greene cluster. However, if you code often in VS Code, the manual approach is bound to get tedious.
