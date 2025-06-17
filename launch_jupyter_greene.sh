@@ -214,7 +214,7 @@ END {
 sleep 20
 
 echo -e "🔁 Forwarding localhost:$LOCAL_PORT to $HOSTNAME:$REMOTE_PORT via greene-compute"
-echo -e "🌐 Access the forwarded port at: http://127.0.0.1:$LOCAL_PORT"
+echo -e "🌐 Access the forwarded port at: http://127.0.0.1:$LOCAL_PORT/lab"
 
 # Wait until Slurm confirms the node is ready
 until ssh -o ConnectTimeout=2 greene-compute 'true' 2>/dev/null; do

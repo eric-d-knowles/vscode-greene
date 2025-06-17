@@ -1,3 +1,5 @@
+I found a few typos and minor clarity issues. Here is the corrected markdown:
+
 # Remote Development on NYU HPC’s Greene Cluster
 
 New York University’s High-Performance Computing (HPC) facility offers browser-based access to Jupyter Notebook, JupyterLab, and other applications through the [OnDemand service](https://sites.google.com/nyu.edu/nyu-hpc/accessing-hpc#h.7kawz2pfzl9d). With OnDemand, you run Jupyter notebooks on a remote server rather than on your personal computer. The computations take place on NYU’s HPC infrastructure, while you interact with the notebooks through your web browser.
@@ -16,22 +18,20 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
 1. **Connect to NYU-NET**
 
-    You’ll need to be on NYU’s network ([NYU-NET](https://www.nyu.edu/life/information-technology/infrastructure/network-services/nyu-net.html)). If your’e on a campus wired or WiFi connection, you’re on NYU-NET already. If you’re off campus, you must connect through NYU’s VPN using the [Cisco AnyConnect software client](https://www.nyu.edu/life/information-technology/infrastructure/network-services/vpn.html).
+    You’ll need to be on NYU’s network ([NYU-NET](https://www.nyu.edu/life/information-technology/infrastructure/network-services/nyu-net.html)). If you’re on a campus wired or WiFi connection, you’re on NYU-NET already. If you’re off campus, you must connect through NYU’s VPN using the [Cisco AnyConnect software client](https://www.nyu.edu/life/information-technology/infrastructure/network-services/vpn.html).
 
 2. **Configure SSH**
 
     Set up a Secure Shell (SSH) configuration on your local machine by adding the entries below to your `~/.ssh/config` file. Don’t forget to replace `<NetID>` with your actual NetID.
     
-    On a Mac, `config` can be easily located by clicking **Go > Go to Folder (⇧⌘G)** from the menu bar and typing `~/.ssh/` in the dialog box. Press Enter to open the folder. Double-click `config` to open it in a TextEdit).
+    On a Mac, `config` can be easily located by clicking **Go > Go to Folder (⇧⌘G)** from the menu bar and typing `~/.ssh/` in the dialog box. Press Enter to open the folder. Double-click `config` to open it in TextEdit.
 
     In Windows, `config` can be found by pressing `Win + R` and typing `%USERPROFILE%\.ssh` in the dialog box and hitting Enter. Right-click on `config`, choose **Open with**, and select a text editor (e.g., Notepad).
-
-
 
     ```
     Host greene-login
     HostName greene.hpc.nyu.edu
-    User <NetID>
+    User edk202 
     StrictHostKeyChecking no
     ServerAliveInterval 60
     ForwardAgent yes
@@ -41,9 +41,12 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     LogLevel ERROR
 
     Host greene-compute
-    HostName <ComputeNode>
-    User <NetID>
+    HostName cm033.hpc.nyu.edu
+    User edk202
     ProxyJump greene-login
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel ERROR
     ```
 
     The `greene-login` entry uses SSH keys to simplify connection to the Greene login node and avoid repeated password prompts. If you don’t already have an SSH key pair (`id_ed25519`), you can generate one by running `ssh-keygen -t ed25519` in a Terminal window connected to your local machine.
@@ -80,11 +83,11 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
 5. **Edit Your SSH Configuration to Reference Your Assigned Compute Node**
 
-    Next, edit your `~/.ssh/config` file to specify the compute node you’ve been assigned. For example, if you are allocated `cm26.hpc.nyu.edu`, swap the `<ComputeNode>` placeholder with `cm026.hpc.nyu.edu`.
+    Next, edit your `~/.ssh/config` file to specify the compute node you’ve been assigned. For example, if you are allocated `cm026.hpc.nyu.edu`, swap the `<ComputeNode>` placeholder with `cm026.hpc.nyu.edu`.
     
     **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. This file lives on your local machine and you won’t be able to find it through the compute node window opened in the last step.
 
-    **Optional update code**: To make updating the `green-compute` HostName easier, run this code in _local_ Terminal window:
+    **Optional update code**: To make updating the `greene-compute` HostName easier, run this code in a _local_ Terminal window:
 
     ```
     echo -n "Enter new HostName for greene-compute: "
@@ -162,7 +165,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
         http://127.0.0.1:8888/lab?token=33d4b561e076e9bdc765dd2acc16b7fc00e431954b6bc5ad
     ```
 
-    The last line is what we need. We’ll use the URL as a whole to access the Jupyter server in VS Code. But before that, we need to ensure that your local machine is listening to the compute node on the right port. That port is listed after the colon in the first part of the URL — in this example `8888`
+    The last line is what we need. We’ll use the URL as a whole to access the Jupyter server in VS Code. But before that, we need to ensure that your local machine is listening to the compute node on the right port. That port is listed after the colon in the first part of the URL — in this example `8888`.
 
 8. **Forward the Local Port to the Remote Port**
 
@@ -180,15 +183,30 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     The final step is to open VS Code and access the Jupyter server you’ve just set up. Here's what to do:
     
-    - Open VS Code on your computer and click the Search box at the top of the VS Code window
-    - Click the **Show and Run Commands** option. In the Search box, start typing `Jupyter: Clear`. The option `Jupyter: Clear Jupyter Remote Server List` should appear at the top  of the list; click it. This will clean up any stale servers from VS Code code's menu cache.
+    - Open VS Code on your computer and click the Search box at the top of the VS Code window.
+    - Click the **Show and Run Commands** option. In the Search box, start typing `Jupyter: Clear`. The option `Jupyter: Clear Jupyter Remote Server List` should appear at the top of the list; click it. This will clean up any stale servers from VS Code's menu cache.
     - Select **File > New File > Jupyter Notebook**. This will open an untitled notebook.
     - In the upper-right corner of the notebook, click **Select Kernel > Existing Jupyter Server**.
-    - Paste in the URL from the Jupyter server output in the compute-node Terminal window. Be sure to copy the one that contains `127.0.0.1` — not the one with with a resolved hostname (e.g., `cm026.hpc.nyu.edu`) in it.
+    - Paste in the URL from the Jupyter server output in the compute-node Terminal window. Be sure to copy the one that contains `127.0.0.1` — not the one with a resolved hostname (e.g., `cm026.hpc.nyu.edu`) in it.
     - Hit enter to connect to your running Jupyter server.
 
 If all goes well, you should now be able to write code in a local instance of VS Code while accessing all the resources you've requested on Greene's compute node!
 
 ## Automating the Entire Process
 
-It can be helpful to walk through the steps above a few times, since they provide a nice snapshot of how to interact with NYU's Greene cluster. However, if you code often in VS Code, the manual approach is bound to get tedious.
+It can be helpful to walk through the steps above a few times, as they exemplify how to interact with NYU's Greene cluster from your personal machine. If you code often in VS Code, however, the manual approach is bound to get tedious. The following script aims to automate the entire process.
+
+**Note:** The script isn't fully tested and isn't guaranteed to work on every system without tweaks.
+
+To use the script, you must:
+
+    1. Be on NYU-NET.
+    2. Have a `~/.ssh/config` file containing the entries shown above.
+    3. Save the script somewhere on your computer (e.g., in `~/code` or `~/scripts`). Paste the code into a text editor and save it in your preferred folder as `launch_jupyter_greene.sh`.
+    4. Give the script execute permission. Open a Terminal window, navigate to the folder containing the script, and run `chmod +x launch_jupyter_greene.sh`.
+
+At this point, you can run the script to set up a connection to a Greene compute node by typing `./launch_jupyter_greene.sh`. You'll be prompted for several options (including the locations of your Singularity container and overlay file and the resources you are requesting). If all goes well, your output will include a line similar to this:
+
+    🌐 Access the forwarded port at: http://127.0.0.1:8888/lab
+
+Now, you can open a notebook in VS Code and make this your kernel path.
