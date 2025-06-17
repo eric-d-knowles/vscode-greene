@@ -213,6 +213,7 @@ Now, you can open a notebook in VS Code and make this your kernel path.
 
 ```
 #!/bin/bash
+
 clear
 
 
