@@ -200,10 +200,10 @@ It can be helpful to walk through the steps above a few times, as they exemplify
 
 To use the script, you must:
 
-    1. Be on NYU-NET.
-    2. Have a `~/.ssh/config` file containing the entries shown above.
-    3. Save the script somewhere on your computer (e.g., in `~/code` or `~/scripts`). Paste the code into a text editor and save it in your preferred folder as `launch_jupyter_greene.sh`.
-    4. Give the script execute permission. Open a Terminal window, navigate to the folder containing the script, and run `chmod +x launch_jupyter_greene.sh`.
+1. Be on NYU-NET.
+2. Have a `~/.ssh/config` file containing the entries shown above.
+3. Save the script somewhere on your computer (e.g., in `~/code` or `~/scripts`). Paste the code into a text editor and save it in your preferred folder as `launch_jupyter_greene.sh`.
+4. Give the script execute permission. Open a Terminal window, navigate to the folder containing the script, and run `chmod +x launch_jupyter_greene.sh`.
 
 At this point, you can run the script to set up a connection to a Greene compute node by typing `./launch_jupyter_greene.sh`. You'll be prompted for several options (including the locations of your Singularity container and overlay file and the resources you are requesting). If all goes well, your output will include a line similar to this:
 
