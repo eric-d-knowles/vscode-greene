@@ -1,5 +1,3 @@
-I found a few typos and minor clarity issues. Here is the corrected markdown:
-
 # Remote Development on NYU HPC’s Greene Cluster
 
 New York University’s High-Performance Computing (HPC) facility offers browser-based access to Jupyter Notebook, JupyterLab, and other applications through the [OnDemand service](https://sites.google.com/nyu.edu/nyu-hpc/accessing-hpc#h.7kawz2pfzl9d). With OnDemand, you run Jupyter notebooks on a remote server rather than on your personal computer. The computations take place on NYU’s HPC infrastructure, while you interact with the notebooks through your web browser.
