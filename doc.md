@@ -29,7 +29,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     ```
     Host greene-login
     HostName greene.hpc.nyu.edu
-    User edk202 
+    User <NetID> 
     StrictHostKeyChecking no
     ServerAliveInterval 60
     ForwardAgent yes
@@ -39,8 +39,8 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     LogLevel ERROR
 
     Host greene-compute
-    HostName cm033.hpc.nyu.edu
-    User edk202
+    HostName cm001.hpc.nyu.edu
+    User <NetID>
     ProxyJump greene-login
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
