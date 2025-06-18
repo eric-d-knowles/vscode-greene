@@ -39,7 +39,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     LogLevel ERROR
 
     Host greene-compute
-    HostName cm001.hpc.nyu.edu
+    HostName <ComputeNode>
     User <NetID>
     ProxyJump greene-login
     StrictHostKeyChecking no
