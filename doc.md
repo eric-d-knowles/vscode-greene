@@ -47,7 +47,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     LogLevel ERROR
     ```
 
-    The `greene-login` entry uses SSH keys to simplify connection to the Greene login node and avoid repeated password prompts. If you don’t already have an SSH key pair (`id_ed25519`), you can generate one by running `ssh-keygen -t ed25519` in a Terminal window connected to your local machine.
+    The `greene-login` entry uses SSH keys to simplify connection to the Greene login node and avoid repeated password prompts. If you don’t already have an SSH key pair (`id_ed25519`), you can generate one by running `ssh-keygen -t ed25519` in a Terminal window connected to your local machine. Then copy your public key to the login server by running `ssh-copy-id <NetID>@greene.hpc.nyu.edu` (replacing `<NetID>` as appropriate).
 
     Because CPU-heavy code should never be run on a login node, we’re going to request resources on a compute node. The SSH configuration file’s `greene-compute` entry makes it easy to connect to that node once it’s assigned. You’ll update the placeholder (`<ComputeNode>`) later to match the node you’ve been allocated.
 
