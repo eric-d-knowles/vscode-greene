@@ -177,7 +177,15 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     
     **Note:** This command needs to be executed on your local machine, so be sure to run it in a new Terminal window; it won’t work in the compute node window.
 
-9. **Activate the Kernel in VS Code**
+9. **Start a Remote SSH Session in VS Code**
+
+Even though you’ll be editing code locally, your files and packages should exist on the Greene cluster (e.g., in your `/scratch` directory). An additional step is required to give the local instance of VS Code access to these files as if they were on your own machine.
+
+Make sure the **Remote-SSH** extension is installed and running in VS Code. You can download and install Remote-SSH by clicking the Extensions icon on the left of the VS Code window (it looks like four imperfectly stacked boxes) and typing "Remote-SSH" in the "Search Extensions in Marketplace" box.
+
+To activate a remote connection to the Greene compute node, click the Remote Explorer icon on the left VS Code pane (look for a little computer monitor). You should see `greene-compute` listed under **SSH**; click the arrow next to it to connect.
+
+11. **Activate the Kernel in VS Code**
 
     The final step is to open VS Code and access the Jupyter server you’ve just set up. Here's what to do:
     
@@ -188,7 +196,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
     - Paste in the URL from the Jupyter server output in the compute-node Terminal window. Be sure to copy the one that contains `127.0.0.1` — not the one with a resolved hostname (e.g., `cm026.hpc.nyu.edu`) in it.
     - Hit enter to connect to your running Jupyter server.
 
-If all goes well, you should now be able to write code in a local instance of VS Code while accessing all the resources you've requested on Greene's compute node!
+If all goes well, you should now be able to edit notebooks in a local instance of VS Code while accessing all the resources you've requested on Greene's compute node.
 
 ## Automating the Entire Process
 
