@@ -83,7 +83,7 @@ Note that the guide assumes familiarity with Singularity containers and conda en
 
     Next, edit your `~/.ssh/config` file to specify the compute node you’ve been assigned. For example, if you are allocated `cm026.hpc.nyu.edu`, swap the `<ComputeNode>` placeholder with `cm026.hpc.nyu.edu`.
     
-    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to open a _new Terminal window_. This file lives on your local machine and you won’t be able to find it through the compute node window opened in the last step.
+    **Note:** You can either edit your SSH configuration file through your local operating system (e.g., macOS or Windows) or through the Terminal. If you wish to edit `~/.ssh/config` in the Terminal using `vim` or `nano` (or another editor), be sure to do so in a _new Terminal window_. This file lives on your local machine and you won’t be able to find it through the compute node window opened in the last step.
 
     **Optional update code**: To make updating the `greene-compute` HostName easier, run this code in a _local_ Terminal window:
 
