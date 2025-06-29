@@ -6,6 +6,31 @@ clear
 
 
 
+# --- Set Pushover User Key ---
+export PUSHOVER_USER_KEY="uoq9wixd1ww2no8vem1kwnezhkd6cn"
+
+# --- Set Pushover API Token ---
+export PUSHOVER_API_TOKEN="adk7vvca5hdn5u2q7sksqaziv1pdqo"
+
+
+
+# --- Pushover notification function ---
+pushover_notify() {
+    local message="$1"
+    if [[ -z "${PUSHOVER_USER_KEY:-}" || -z "${PUSHOVER_API_TOKEN:-}" ]]; then
+        printf '\033[1;31m[Pushover] PUSHOVER_USER_KEY or PUSHOVER_API_TOKEN not set. Skipping notification.\033[0m\n'
+        return
+    fi
+    curl -s --form-string "token=$PUSHOVER_API_TOKEN" \
+         --form-string "user=$PUSHOVER_USER_KEY" \
+         --form-string "message=$message" \
+         https://api.pushover.net/1/messages.json > /dev/null || \
+         printf '\033[1;31m[Pushover] Failed to send notification.\033[0m\n'
+}
+
+
+
+
 # --- Cleanup on abort ---
 cleanup() {
     printf '\033[1;31mAborted. Cleaning up jobs on greene-login...\033[0m\n'
@@ -114,6 +139,9 @@ RAM_MB=$(( RAM_NUM * 1000 ))
 # === Prepare request ===
 printf '\033[1;31mPreparing request...\033[0m\n'
 
+# Notify: request submitted
+pushover_notify "[Greene] Jupyter request submitted. Waiting for compute node..."
+
 # Cancel leftover jobs and tunnels
 printf '  Cleaning up any leftover compute jobs and tunnels\n'
 ssh greene-login "scancel -u \$USER || true"
@@ -186,6 +214,7 @@ for i in {1..3600}; do
   if [[ -n "$HOSTNAME" ]]; then
     printf '\033[1;31mRequest granted!\033[0m\n'
     printf '\n'
+    pushover_notify "[Greene] Jupyter request granted! Node: $HOSTNAME"
     break
   fi
   sleep 1
