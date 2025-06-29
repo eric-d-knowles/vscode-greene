@@ -220,14 +220,23 @@ Now, you can open a notebook in VS Code and make this your kernel path.
 ### `launch_jupyter_greene.sh`
 
 ```
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
 clear
 
+# --- Cleanup on abort ---
+cleanup() {
+    echo -e "\033[1;31mAborted. Cleaning up jobs and tunnels...\033[0m"
+    ssh greene-login "scancel -u $USER || true"
+    lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
+    exit 1
+}
+trap cleanup INT TERM
 
 # Define SSH config path
 SSH_CONFIG="$HOME/.ssh/config"
-
 
 # === Resource preference file ===
 CONFIG_DIR="$HOME/.config/greene"
@@ -248,7 +257,8 @@ DEFAULT_CONDA_ENV="word2gm-fast2"
 
 # Load previous values
 if [[ -f "$PREFS_FILE" ]]; then
-  source "$PREFS_FILE"
+    # shellcheck source=/dev/null
+    source "$PREFS_FILE"
 fi
 
 # Fall back to hardcoded defaults
@@ -262,7 +272,6 @@ LOCAL_PORT="${LOCAL_PORT:-$DEFAULT_LOCAL_PORT}"
 OVERLAY_PATH="${OVERLAY_PATH:-$DEFAULT_OVERLAY_PATH}"
 CONTAINER_PATH="${CONTAINER_PATH:-$DEFAULT_CONTAINER_PATH}"
 CONDA_ENV_NAME="${CONDA_ENV_NAME:-$DEFAULT_CONDA_ENV}"
-
 
 # === Prompt for resource preferences ===
 echo -e "\033[1;34mPlease specify your Greene-compute resource request:\033[0m"
@@ -308,15 +317,13 @@ EOF
 RAM_NUM=$(echo "$RAM" | sed 's/[Gg]//')
 RAM_MB=$(( RAM_NUM * 1000 ))
 
-
 # === Prepare request ===
 echo -e "\033[1;31mPreparing request...\033[0m"
 
 # Cancel leftover jobs and tunnels
 echo -e "  Cleaning up any leftover compute jobs and tunnels"
-
 ssh greene-login "scancel -u \$USER || true"
-lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9
+lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
 
 # Create and upload launcher script
 echo -e "  Uploading Jupyter launcher script"
@@ -337,7 +344,6 @@ EOF
 
 ssh greene-login "chmod +x \$HOME/.config/greene/launch_jupyter.sh"
 
-
 # Create and upload the entrypoint script
 echo -e "  Uploading entrypoint script"
 echo
@@ -351,7 +357,6 @@ sleep infinity
 EOF
 
 ssh greene-login "chmod +x \$HOME/.config/greene/job_script.sh"
-
 
 # === Prepare request ===
 echo -e "\033[1;31mSubmitting request...\033[0m"

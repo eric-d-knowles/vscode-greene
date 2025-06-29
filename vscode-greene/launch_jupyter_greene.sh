@@ -1,11 +1,15 @@
 
-#!/bin/bash
+
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
 clear
 
+
 # --- Cleanup on abort ---
 cleanup() {
-    echo -e "\033[1;31mAborted. Cleaning up jobs and tunnels...\033[0m"
+    printf '\033[1;31mAborted. Cleaning up jobs and tunnels...\033[0m\n'
     ssh greene-login "scancel -u $USER || true"
     lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
     exit 1
@@ -13,14 +17,17 @@ cleanup() {
 trap cleanup INT TERM
 
 
+
 # Define SSH config path
 SSH_CONFIG="$HOME/.ssh/config"
+
 
 
 # === Resource preference file ===
 CONFIG_DIR="$HOME/.config/greene"
 PREFS_FILE="$CONFIG_DIR/last_job_prefs"
 mkdir -p "$CONFIG_DIR"
+
 
 # Hardcoded fallbacks
 DEFAULT_TIME_HOURS=1
@@ -34,10 +41,13 @@ DEFAULT_OVERLAY_PATH="/scratch/edk202/word2gm_ol/overlay-15GB-500K.ext3"
 DEFAULT_CONTAINER_PATH="/scratch/work/public/singularity/cuda12.6.3-cudnn9.5.1-ubuntu22.04.5.sif"
 DEFAULT_CONDA_ENV="word2gm-fast2"
 
+
 # Load previous values
 if [[ -f "$PREFS_FILE" ]]; then
-  source "$PREFS_FILE"
+    # shellcheck source=/dev/null
+    source "$PREFS_FILE"
 fi
+
 
 # Fall back to hardcoded defaults
 TIME_HOURS="${TIME_HOURS:-$DEFAULT_TIME_HOURS}"
@@ -52,8 +62,9 @@ CONTAINER_PATH="${CONTAINER_PATH:-$DEFAULT_CONTAINER_PATH}"
 CONDA_ENV_NAME="${CONDA_ENV_NAME:-$DEFAULT_CONDA_ENV}"
 
 
+
 # === Prompt for resource preferences ===
-echo -e "\033[1;34mPlease specify your Greene-compute resource request:\033[0m"
+printf '\033[1;34mPlease specify your Greene-compute resource request:\033[0m\n'
 read -p "  Job duration in hours (default: ${TIME_HOURS:-1}): " input_time
 read -p "  Slurm partition [eg: short, rtx8000, any] (default: $PARTITION): " input_partition
 read -p "  Number of CPUs [1–14] (default: $CPUS): " input_cpus
@@ -64,7 +75,8 @@ read -p "  Local port to access it (default: $LOCAL_PORT): " input_local
 read -p "  Overlay path (default: $OVERLAY_PATH): " input_overlay
 read -p "  Container path (default: $CONTAINER_PATH): " input_container
 read -p "  Conda environment name (default: $CONDA_ENV_NAME): " input_env
-echo
+printf '\n'
+
 
 # Apply only if user gave input
 [[ -n "$input_time" ]] && TIME_HOURS="$input_time"
@@ -77,6 +89,7 @@ echo
 [[ -n "$input_overlay" ]] && OVERLAY_PATH="$input_overlay"
 [[ -n "$input_container" ]] && CONTAINER_PATH="$input_container"
 [[ -n "$input_env" ]] && CONDA_ENV_NAME="$input_env"
+
 
 # Save for next session
 cat > "$PREFS_FILE" <<EOF
@@ -92,6 +105,7 @@ CONTAINER_PATH="$CONTAINER_PATH"
 CONDA_ENV_NAME="$CONDA_ENV_NAME"
 EOF
 
+
 # Convert RAM to SLURM format
 RAM_NUM=$(echo "$RAM" | sed 's/[Gg]//')
 RAM_MB=$(( RAM_NUM * 1000 ))
@@ -99,15 +113,15 @@ RAM_MB=$(( RAM_NUM * 1000 ))
 
 
 # === Prepare request ===
-echo -e "\033[1;31mPreparing request...\033[0m"
+printf '\033[1;31mPreparing request...\033[0m\n'
 
 # Cancel leftover jobs and tunnels
-echo -e "  Cleaning up any leftover compute jobs and tunnels"
+printf '  Cleaning up any leftover compute jobs and tunnels\n'
 ssh greene-login "scancel -u \$USER || true"
 lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
 
 # Create and upload launcher script
-echo -e "  Uploading Jupyter launcher script"
+printf '  Uploading Jupyter launcher script\n'
 
 ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/launch_jupyter.sh" <<EOF
 #!/bin/bash
@@ -127,8 +141,8 @@ ssh greene-login "chmod +x \$HOME/.config/greene/launch_jupyter.sh"
 
 
 # Create and upload the entrypoint script
-echo -e "  Uploading entrypoint script"
-echo
+printf '  Uploading entrypoint script\n'
+printf '\n'
 
 ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/job_script.sh" <<EOF
 #!/bin/bash
@@ -142,7 +156,7 @@ ssh greene-login "chmod +x \$HOME/.config/greene/job_script.sh"
 
 
 # === Prepare request ===
-echo -e "\033[1;31mSubmitting request...\033[0m"
+printf '\033[1;31mSubmitting request...\033[0m\n'
 
 # SSH into Greene, launch compute node, write hostname
 ssh greene-login "
@@ -164,24 +178,24 @@ ssh greene-login "
 for i in {1..3600}; do
   HOSTNAME=$(ssh greene-login "cat .config/greene/last_node.txt 2>/dev/null" || true)
   if [[ -n "$HOSTNAME" ]]; then
-    echo -e "\033[1;31mRequest granted!\033[0m"
-    echo
+    printf '\033[1;31mRequest granted!\033[0m\n'
+    printf '\n'
     break
   fi
   sleep 1
 done
 
 if [[ -z "$HOSTNAME" ]]; then
-  echo -e "❌ Timed out waiting for compute node assignment."
+  printf '❌ Timed out waiting for compute node assignment.\n'
   exit 1
 fi
 
-echo -e "\033[1;34mConnection info:\033[0m"
-echo -e "  Node assigned: \033[1;33m$HOSTNAME\033[0m"
+printf '\033[1;34mConnection info:\033[0m\n'
+printf '  Node assigned: \033[1;33m%s\033[0m\n' "$HOSTNAME"
 ssh greene-login "rm -f .config/greene/last_node.txt"
 
 #  Update local SSH config
-echo -e "  Updating ~/.ssh/config"
+printf '  Updating ~/.ssh/config\n'
 
 awk -v nh="$HOSTNAME" '
 /^Host greene-compute$/ {
@@ -202,14 +216,14 @@ END {
 ' "$SSH_CONFIG" > "${SSH_CONFIG}.tmp" && mv "${SSH_CONFIG}.tmp" "$SSH_CONFIG"
 
 # Forward port from compute node to local
-echo -e "  Forwarding local port"
-sleep 20
-
 echo -e "  Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:$LOCAL_PORT/lab\033[0m"
+printf '  Forwarding local port\n'
+sleep 20
+printf '  Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:%s/lab\033[0m\n' "$LOCAL_PORT"
 
 # Wait until Slurm confirms the node is ready
 until ssh -o ConnectTimeout=2 greene-compute 'true' 2>/dev/null; do
-    echo "...Waiting for greene-compute to accept SSH..."
+    printf '...Waiting for greene-compute to accept SSH...\n'
     sleep 3
 done
 
