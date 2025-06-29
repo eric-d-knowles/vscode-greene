@@ -265,16 +265,18 @@ CONDA_ENV_NAME="${CONDA_ENV_NAME:-$DEFAULT_CONDA_ENV}"
 
 
 # === Prompt for resource preferences ===
-read -p "⏱  Job duration in hours [1–24+] (default: ${TIME_HOURS:-1}): " input_time
-read -p "📊 Slurm partition (default: $PARTITION): " input_partition
-read -p "🧠 Number of CPUs [1–14] (default: $CPUS): " input_cpus
-read -p "🧠 RAM [1,2,4,8,16,32,64,96,128G] (default: $RAM): " input_ram
-read -p "🧠 GPU? [yes/no] (default: $GPU): " input_gpu
-read -p "🔌 Remote port for Jupyter (default: $REMOTE_PORT): " input_remote
-read -p "🔌 Local port to access it (default: $LOCAL_PORT): " input_local
-read -p "📂 Overlay path (default: $OVERLAY_PATH): " input_overlay
-read -p "📦 Container path (default: $CONTAINER_PATH): " input_container
-read -p "🧪 Conda environment name (default: $CONDA_ENV_NAME): " input_env
+echo -e "\033[1;34mPlease specify your Greene-compute resource request:\033[0m"
+read -p "  Job duration in hours (default: ${TIME_HOURS:-1}): " input_time
+read -p "  Slurm partition [eg: short, rtx8000, any] (default: $PARTITION): " input_partition
+read -p "  Number of CPUs [1–14] (default: $CPUS): " input_cpus
+read -p "  RAM [GBs] (default: $RAM): " input_ram
+read -p "  GPU? [yes/no] (default: $GPU): " input_gpu
+read -p "  Remote port for Jupyter (default: $REMOTE_PORT): " input_remote
+read -p "  Local port to access it (default: $LOCAL_PORT): " input_local
+read -p "  Overlay path (default: $OVERLAY_PATH): " input_overlay
+read -p "  Container path (default: $CONTAINER_PATH): " input_container
+read -p "  Conda environment name (default: $CONDA_ENV_NAME): " input_env
+echo
 
 # Apply only if user gave input
 [[ -n "$input_time" ]] && TIME_HOURS="$input_time"
@@ -302,47 +304,31 @@ CONTAINER_PATH="$CONTAINER_PATH"
 CONDA_ENV_NAME="$CONDA_ENV_NAME"
 EOF
 
-
-# === Convert RAM to Slurm format ===
-RAM_MB=$(( $RAM * 1000 ))
-
-
-# === Print summary of selected resources ===
-echo
-echo -e "\n🔧 \033[1mSelected resources:\033[0m"
-echo -e "⏱  Job duration: \033[1m${TIME_HOURS} hours\033[0m"
-echo -e "📊 Slurm partition: \033[1m$PARTITION\033[0m"
-echo -e "🧠 Number of CPUs: \033[1m$CPUS\033[0m"
-echo -e "🧠 RAM: \033[1m$RAM_MB MB\033[0m"
-echo -e "🧠 GPU: \033[1m$GPU\033[0m"
-echo -e "🔌 Remote port for Jupyter: \033[1m$REMOTE_PORT\033[0m"
-echo -e "🔌 Local port to access it: \033[1m$LOCAL_PORT\033[0m"
-echo -e "📂 Overlay path: \033[1m$OVERLAY_PATH\033[0m"
-echo -e "📦 Container path: \033[1m$CONTAINER_PATH\033[0m"
-echo -e "🧪 Conda environment name: \033[1m$CONDA_ENV_NAME\033[0m"
-echo
+# Convert RAM to SLURM format
+RAM_NUM=$(echo "$RAM" | sed 's/[Gg]//')
+RAM_MB=$(( RAM_NUM * 1000 ))
 
 
-echo -e "🚀 \033[1mRUNNING!\033[0m"
+# === Prepare request ===
+echo -e "\033[1;31mPreparing request...\033[0m"
 
-
-# === Step 0: Cancel leftover jobs and tunnels ===
-echo -e "🧹 Cleaning up any leftover compute jobs and tunnels..."
+# Cancel leftover jobs and tunnels
+echo -e "  Cleaning up any leftover compute jobs and tunnels"
 
 ssh greene-login "scancel -u \$USER || true"
 lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9
 
-
-# === Step 1: Create and upload launcher script ===
-
-echo -e "📄 Uploading Jupyter launcher script..."
+# Create and upload launcher script
+echo -e "  Uploading Jupyter launcher script"
 
 ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/launch_jupyter.sh" <<EOF
 #!/bin/bash
 
 source /ext3/env.sh
 conda activate ${CONDA_ENV_NAME}
-pip install --quiet ipykernel
+if ! python -c 'import ipykernel' 2>/dev/null; then
+  pip install --quiet ipykernel
+fi
 python -m ipykernel install --user \
   --name ${CONDA_ENV_NAME} \
   --display-name "Remote kernel: ${CONDA_ENV_NAME}"
@@ -352,50 +338,46 @@ EOF
 ssh greene-login "chmod +x \$HOME/.config/greene/launch_jupyter.sh"
 
 
-# === Step 2: Create and upload the entrypoint script ===
+# Create and upload the entrypoint script
+echo -e "  Uploading entrypoint script"
+echo
 
-echo -e "📄 Uploading entrypoint script..."
-
-ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/compute_entrypoint.sh" <<EOF
+ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/job_script.sh" <<EOF
 #!/bin/bash
 
 /usr/bin/hostname > \$HOME/.config/greene/last_node.txt
+nohup bash \$HOME/.config/greene/launch_jupyter.sh > \$HOME/.jupyter/jlab.log 2>&1 &
+sleep infinity
 EOF
 
-ssh greene-login "chmod +x \$HOME/.config/greene/compute_entrypoint.sh"
+ssh greene-login "chmod +x \$HOME/.config/greene/job_script.sh"
 
 
-# === Step 3: SSH into Greene, launch compute node, write hostname ===
+# === Prepare request ===
+echo -e "\033[1;31mSubmitting request...\033[0m"
 
-echo -e "🚀 Launching compute node on Greene..."
-
+# SSH into Greene, launch compute node, write hostname
 ssh greene-login "
   export OVERLAY_PATH='$OVERLAY_PATH'
   export CONTAINER_PATH='$CONTAINER_PATH'
 
   nohup srun \
      --time=${TIME_HOURS}:00:00 \
-     --partition=$PARTITION \
+     $([[ \"$PARTITION\" != \"any\" ]] && echo \"--partition=$PARTITION\") \
      --cpus-per-task=$CPUS \
      --mem=$RAM_MB \
-     $([[ "$GPU" == "yes" ]] && echo "--gres=gpu:1") \
-     bash -c '
-    singularity exec --overlay \$OVERLAY_PATH:rw \$CONTAINER_PATH bash -c \"
-      bash \$HOME/.config/greene/compute_entrypoint.sh;
-      nohup bash \$HOME/.config/greene/launch_jupyter.sh > \$HOME/.jupyter/jlab.log 2>&1 &
-      sleep infinity
-    \"
-  ' > \$HOME/.jupyter/srun_debug.log 2>&1 &
+     $([[ \"$GPU\" == \"yes\" ]] && echo \"--gres=gpu:1\") \
+     singularity exec --overlay \$OVERLAY_PATH:rw $([[ \"$GPU\" == \"yes\" ]] && echo \"--nv\") \$CONTAINER_PATH bash \$HOME/.config/greene/job_script.sh \
+     > \$HOME/.jupyter/srun_debug.log 2>&1 &
   disown
 "
 
-
-# === Step 4: Poll for compute node hostname ===
-
-for i in {1..30}; do
+# Poll for compute node hostname
+for i in {1..3600}; do
   HOSTNAME=$(ssh greene-login "cat .config/greene/last_node.txt 2>/dev/null" || true)
   if [[ -n "$HOSTNAME" ]]; then
-    echo -e "📎 Compute node assigned: $HOSTNAME"
+    echo -e "\033[1;31mRequest granted!\033[0m"
+    echo
     break
   fi
   sleep 1
@@ -406,12 +388,12 @@ if [[ -z "$HOSTNAME" ]]; then
   exit 1
 fi
 
+echo -e "\033[1;34mConnection info:\033[0m"
+echo -e "  Node assigned: \033[1;33m$HOSTNAME\033[0m"
 ssh greene-login "rm -f .config/greene/last_node.txt"
 
-
-# === Step 5: Update local SSH config ===
-
-echo -e "🛠  Updating ~/.ssh/config: greene-compute → $HOSTNAME"
+#  Update local SSH config
+echo -e "  Updating ~/.ssh/config"
 
 awk -v nh="$HOSTNAME" '
 /^Host greene-compute$/ {
@@ -431,17 +413,15 @@ END {
 }
 ' "$SSH_CONFIG" > "${SSH_CONFIG}.tmp" && mv "${SSH_CONFIG}.tmp" "$SSH_CONFIG"
 
-
-# === Step 6: Forward port from compute node to local ===
-
+# Forward port from compute node to local
+echo -e "  Forwarding local port"
 sleep 20
 
-echo -e "🔁 Forwarding localhost:$LOCAL_PORT to $HOSTNAME:$REMOTE_PORT via greene-compute"
-echo -e "🌐 Access the forwarded port at: http://127.0.0.1:$LOCAL_PORT/lab"
+echo -e "  Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:$LOCAL_PORT/lab\033[0m"
 
 # Wait until Slurm confirms the node is ready
 until ssh -o ConnectTimeout=2 greene-compute 'true' 2>/dev/null; do
-    echo "⏳ Waiting for greene-compute to accept SSH..."
+    echo "...Waiting for greene-compute to accept SSH..."
     sleep 3
 done
 
