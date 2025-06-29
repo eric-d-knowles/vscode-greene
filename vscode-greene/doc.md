@@ -226,22 +226,26 @@ IFS=$'\n\t'
 
 clear
 
+
 # --- Cleanup on abort ---
 cleanup() {
-    echo -e "\033[1;31mAborted. Cleaning up jobs and tunnels...\033[0m"
-    ssh greene-login "scancel -u $USER || true"
+    printf '\033[1;31mAborted. Cleaning up jobs on greene-login...\033[0m\n'
+    ssh greene-login 'scancel -u $USER || true'
     lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
     exit 1
 }
 trap cleanup INT TERM
 
+
 # Define SSH config path
 SSH_CONFIG="$HOME/.ssh/config"
+
 
 # === Resource preference file ===
 CONFIG_DIR="$HOME/.config/greene"
 PREFS_FILE="$CONFIG_DIR/last_job_prefs"
 mkdir -p "$CONFIG_DIR"
+
 
 # Hardcoded fallbacks
 DEFAULT_TIME_HOURS=1
@@ -255,11 +259,13 @@ DEFAULT_OVERLAY_PATH="/scratch/edk202/word2gm_ol/overlay-15GB-500K.ext3"
 DEFAULT_CONTAINER_PATH="/scratch/work/public/singularity/cuda12.6.3-cudnn9.5.1-ubuntu22.04.5.sif"
 DEFAULT_CONDA_ENV="word2gm-fast2"
 
+
 # Load previous values
 if [[ -f "$PREFS_FILE" ]]; then
     # shellcheck source=/dev/null
     source "$PREFS_FILE"
 fi
+
 
 # Fall back to hardcoded defaults
 TIME_HOURS="${TIME_HOURS:-$DEFAULT_TIME_HOURS}"
@@ -273,8 +279,9 @@ OVERLAY_PATH="${OVERLAY_PATH:-$DEFAULT_OVERLAY_PATH}"
 CONTAINER_PATH="${CONTAINER_PATH:-$DEFAULT_CONTAINER_PATH}"
 CONDA_ENV_NAME="${CONDA_ENV_NAME:-$DEFAULT_CONDA_ENV}"
 
+
 # === Prompt for resource preferences ===
-echo -e "\033[1;34mPlease specify your Greene-compute resource request:\033[0m"
+printf '\033[1;34mPlease specify your Greene-compute resource request:\033[0m\n'
 read -p "  Job duration in hours (default: ${TIME_HOURS:-1}): " input_time
 read -p "  Slurm partition [eg: short, rtx8000, any] (default: $PARTITION): " input_partition
 read -p "  Number of CPUs [1–14] (default: $CPUS): " input_cpus
@@ -285,7 +292,8 @@ read -p "  Local port to access it (default: $LOCAL_PORT): " input_local
 read -p "  Overlay path (default: $OVERLAY_PATH): " input_overlay
 read -p "  Container path (default: $CONTAINER_PATH): " input_container
 read -p "  Conda environment name (default: $CONDA_ENV_NAME): " input_env
-echo
+printf '\n'
+
 
 # Apply only if user gave input
 [[ -n "$input_time" ]] && TIME_HOURS="$input_time"

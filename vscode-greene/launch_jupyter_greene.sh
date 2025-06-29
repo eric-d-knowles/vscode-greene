@@ -7,10 +7,11 @@ IFS=$'\n\t'
 clear
 
 
+
 # --- Cleanup on abort ---
 cleanup() {
-    printf '\033[1;31mAborted. Cleaning up jobs and tunnels...\033[0m\n'
-    ssh greene-login "scancel -u $USER || true"
+    printf '\033[1;31mAborted. Cleaning up jobs on greene-login...\033[0m\n'
+    ssh greene-login 'scancel -u $USER || true'
     lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
     exit 1
 }
@@ -144,11 +145,18 @@ ssh greene-login "chmod +x \$HOME/.config/greene/launch_jupyter.sh"
 printf '  Uploading entrypoint script\n'
 printf '\n'
 
-ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/job_script.sh" <<EOF
+
+
+ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/job_script.sh" <<'EOF'
 #!/bin/bash
 
-/usr/bin/hostname > \$HOME/.config/greene/last_node.txt
-nohup bash \$HOME/.config/greene/launch_jupyter.sh > \$HOME/.jupyter/jlab.log 2>&1 &
+cleanup_remote() {
+    bash $HOME/.config/greene/cleanup_greene.sh $USER $LOCAL_PORT
+}
+trap cleanup_remote INT TERM EXIT
+
+/usr/bin/hostname > $HOME/.config/greene/last_node.txt
+nohup bash $HOME/.config/greene/launch_jupyter.sh > $HOME/.jupyter/jlab.log 2>&1 &
 sleep infinity
 EOF
 
