@@ -33,7 +33,7 @@ pushover_notify() {
 
 # --- Cleanup on abort ---
 cleanup() {
-    printf '\033[1;31mAborted. Cleaning up jobs on greene-login...\033[0m\n'
+    printf '\033[1;31m\nAborted. Cleaning up jobs on greene-login...\033[0m\n'
     ssh greene-login 'scancel -u $USER || true'
     lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
     exit 1
@@ -214,7 +214,6 @@ for i in {1..3600}; do
   if [[ -n "$HOSTNAME" ]]; then
     printf '\033[1;31mRequest granted!\033[0m\n'
     printf '\n'
-    pushover_notify "[Greene] Jupyter request granted! Node: $HOSTNAME"
     break
   fi
   sleep 1
@@ -251,16 +250,21 @@ END {
 ' "$SSH_CONFIG" > "${SSH_CONFIG}.tmp" && mv "${SSH_CONFIG}.tmp" "$SSH_CONFIG"
 
 # Forward port from compute node to local
-echo -e "  Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:$LOCAL_PORT/lab\033[0m"
-printf '  Forwarding local port\n'
 sleep 20
-printf '  Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:%s/lab\033[0m\n' "$LOCAL_PORT"
 
 # Wait until Slurm confirms the node is ready
 until ssh -o ConnectTimeout=2 greene-compute 'true' 2>/dev/null; do
-    printf '...Waiting for greene-compute to accept SSH...\n'
+    printf '  Waiting for greene-compute to accept SSH...\n'
     sleep 3
 done
 
-# Now forward
-ssh -N -L $LOCAL_PORT:localhost:$REMOTE_PORT greene-compute
+# Now forward (background subprocess)
+printf '  Forwarding local port\n'
+ssh -N -L $LOCAL_PORT:localhost:$REMOTE_PORT greene-compute &
+PORT_FORWARD_PID=$!
+
+# Print access info and send notification after port forward starts
+printf '  Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:%s/lab\033[0m\n' "$LOCAL_PORT"
+pushover_notify "[Greene] Jupyter request granted! Node: $HOSTNAME"
+
+# Optionally: To stop the port forward later, run: kill $PORT_FORWARD_PID
