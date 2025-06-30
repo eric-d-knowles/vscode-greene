@@ -89,16 +89,16 @@ CONDA_ENV_NAME="${CONDA_ENV_NAME:-$DEFAULT_CONDA_ENV}"
 
 # === Prompt for resource preferences ===
 printf '\033[1;34mPlease specify your Greene-compute resource request:\033[0m\n'
-read -p "  Job duration in hours (default: ${TIME_HOURS:-1}): " input_time
-read -p "  Slurm partition [eg: short, rtx8000, any] (default: $PARTITION): " input_partition
-read -p "  Number of CPUs [1–14] (default: $CPUS): " input_cpus
-read -p "  RAM [GBs] (default: $RAM): " input_ram
-read -p "  GPU? [yes/no] (default: $GPU): " input_gpu
-read -p "  Remote port for Jupyter (default: $REMOTE_PORT): " input_remote
-read -p "  Local port to access it (default: $LOCAL_PORT): " input_local
-read -p "  Overlay path (default: $OVERLAY_PATH): " input_overlay
-read -p "  Container path (default: $CONTAINER_PATH): " input_container
-read -p "  Conda environment name (default: $CONDA_ENV_NAME): " input_env
+read -p "Job duration in hours (default: ${TIME_HOURS:-1}): " input_time
+read -p "Slurm partition [eg: short, rtx8000, any] (default: $PARTITION): " input_partition
+read -p "Number of CPUs [1–14] (default: $CPUS): " input_cpus
+read -p "RAM [GBs] (default: $RAM): " input_ram
+read -p "GPU? [yes/no] (default: $GPU): " input_gpu
+read -p "Remote port for Jupyter (default: $REMOTE_PORT): " input_remote
+read -p "Local port to access it (default: $LOCAL_PORT): " input_local
+read -p "Overlay path (default: $OVERLAY_PATH): " input_overlay
+read -p "Container path (default: $CONTAINER_PATH): " input_container
+read -p "Conda environment name (default: $CONDA_ENV_NAME): " input_env
 printf '\n'
 
 
@@ -139,16 +139,13 @@ RAM_MB=$(( RAM_NUM * 1000 ))
 # === Prepare request ===
 printf '\033[1;31mPreparing request...\033[0m\n'
 
-# Notify: request submitted
-pushover_notify "[Greene] Jupyter request submitted. Waiting for compute node..."
-
 # Cancel leftover jobs and tunnels
-printf '  Cleaning up any leftover compute jobs and tunnels\n'
+printf 'Cleaning up any leftover compute jobs and tunnels\n'
 ssh greene-login "scancel -u \$USER || true"
 lsof -i tcp:${LOCAL_PORT} | grep ssh | awk '{print $2}' | xargs -r kill -9 || true
 
 # Create and upload launcher script
-printf '  Uploading Jupyter launcher script\n'
+printf 'Uploading Jupyter launcher script\n'
 
 ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/launch_jupyter.sh" <<EOF
 #!/bin/bash
@@ -168,7 +165,7 @@ ssh greene-login "chmod +x \$HOME/.config/greene/launch_jupyter.sh"
 
 
 # Create and upload the entrypoint script
-printf '  Uploading entrypoint script\n'
+printf 'Uploading entrypoint script\n'
 printf '\n'
 
 
@@ -189,8 +186,11 @@ EOF
 ssh greene-login "chmod +x \$HOME/.config/greene/job_script.sh"
 
 
-# === Prepare request ===
+# === Submit request ===
 printf '\033[1;31mSubmitting request...\033[0m\n'
+
+# Notify: request submitted
+pushover_notify "[Greene] Jupyter request submitted. Waiting for compute node..."
 
 # SSH into Greene, launch compute node, write hostname
 ssh greene-login "
@@ -224,12 +224,12 @@ if [[ -z "$HOSTNAME" ]]; then
   exit 1
 fi
 
-printf '\033[1;34mConnection info:\033[0m\n'
-printf '  Node assigned: \033[1;33m%s\033[0m\n' "$HOSTNAME"
+printf '\033[1;34mConnection info:\033[0m\n'  
+printf 'Node assigned: \033[1;33m%s\033[0m\n' "$HOSTNAME"
 ssh greene-login "rm -f .config/greene/last_node.txt"
 
 #  Update local SSH config
-printf '  Updating ~/.ssh/config\n'
+printf 'Updating ~/.ssh/config\n'
 
 awk -v nh="$HOSTNAME" '
 /^Host greene-compute$/ {
@@ -254,17 +254,17 @@ sleep 20
 
 # Wait until Slurm confirms the node is ready
 until ssh -o ConnectTimeout=2 greene-compute 'true' 2>/dev/null; do
-    printf '  Waiting for greene-compute to accept SSH...\n'
+    printf 'Waiting for greene-compute to accept SSH...\n'
     sleep 3
 done
 
 # Now forward (background subprocess)
-printf '  Forwarding local port\n'
+printf 'Forwarding local port\n'
 ssh -N -L $LOCAL_PORT:localhost:$REMOTE_PORT greene-compute &
 PORT_FORWARD_PID=$!
 
 # Print access info and send notification after port forward starts
-printf '  Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:%s/lab\033[0m\n' "$LOCAL_PORT"
-pushover_notify "[Greene] Jupyter request granted! Node: $HOSTNAME"
+printf 'Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:%s/lab\033[0m\n' "$LOCAL_PORT"
+printf '\n'
 
-# Optionally: To stop the port forward later, run: kill $PORT_FORWARD_PID
+pushover_notify "[Greene] Jupyter request granted! Node: $HOSTNAME"
