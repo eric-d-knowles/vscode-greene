@@ -189,7 +189,6 @@ ssh greene-login "chmod +x \$HOME/.config/greene/job_script.sh"
 # === Submit request ===
 printf '\033[1;31mSubmitting request...\033[0m\n'
 
-# Notify: request submitted
 pushover_notify "[Greene] Jupyter request submitted. Waiting for compute node..."
 
 # SSH into Greene, launch compute node, write hostname
@@ -229,7 +228,7 @@ printf 'Node assigned: \033[1;33m%s\033[0m\n' "$HOSTNAME"
 ssh greene-login "rm -f .config/greene/last_node.txt"
 
 #  Update local SSH config
-printf 'Updating ~/.ssh/config\n'
+printf 'Updating SSH config file\n'
 
 awk -v nh="$HOSTNAME" '
 /^Host greene-compute$/ {
