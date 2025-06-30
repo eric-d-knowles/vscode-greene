@@ -6,15 +6,15 @@ clear
 
 
 
-# --- Set Pushover User Key ---
-export PUSHOVER_USER_KEY="uoq9wixd1ww2no8vem1kwnezhkd6cn"
+# === Set Up Pushover ===
 
-# --- Set Pushover API Token ---
+# Set user key and API token
+
+export PUSHOVER_USER_KEY="uoq9wixd1ww2no8vem1kwnezhkd6cn"
 export PUSHOVER_API_TOKEN="adk7vvca5hdn5u2q7sksqaziv1pdqo"
 
+# Notification function
 
-
-# --- Pushover notification function ---
 pushover_notify() {
     local message="$1"
     if [[ -z "${PUSHOVER_USER_KEY:-}" || -z "${PUSHOVER_API_TOKEN:-}" ]]; then
@@ -30,8 +30,8 @@ pushover_notify() {
 
 
 
+# === Cleanup On Abort ===
 
-# --- Cleanup on abort ---
 cleanup() {
     printf '\033[1;31m\nAborted. Cleaning up jobs on greene-login...\033[0m\n'
     ssh greene-login 'scancel -u $USER || true'
@@ -41,19 +41,21 @@ cleanup() {
 trap cleanup INT TERM
 
 
+# === Set Locations ===
 
 # Define SSH config path
 SSH_CONFIG="$HOME/.ssh/config"
 
-
-
-# === Resource preference file ===
+# Resource preference file ===
 CONFIG_DIR="$HOME/.config/greene"
 PREFS_FILE="$CONFIG_DIR/last_job_prefs"
 mkdir -p "$CONFIG_DIR"
 
 
-# Hardcoded fallbacks
+
+# === Handle Resource Request ===
+
+# Hardcoded defaults
 DEFAULT_TIME_HOURS=1
 DEFAULT_PARTITION="short"
 DEFAULT_CPUS=4
@@ -65,15 +67,13 @@ DEFAULT_OVERLAY_PATH="/scratch/edk202/word2gm_ol/overlay-15GB-500K.ext3"
 DEFAULT_CONTAINER_PATH="/scratch/work/public/singularity/cuda12.6.3-cudnn9.5.1-ubuntu22.04.5.sif"
 DEFAULT_CONDA_ENV="word2gm-fast2"
 
-
 # Load previous values
 if [[ -f "$PREFS_FILE" ]]; then
     # shellcheck source=/dev/null
     source "$PREFS_FILE"
 fi
 
-
-# Fall back to hardcoded defaults
+# Fall back to defaults
 TIME_HOURS="${TIME_HOURS:-$DEFAULT_TIME_HOURS}"
 PARTITION="${PARTITION:-$DEFAULT_PARTITION}"
 CPUS="${CPUS:-$DEFAULT_CPUS}"
@@ -85,9 +85,7 @@ OVERLAY_PATH="${OVERLAY_PATH:-$DEFAULT_OVERLAY_PATH}"
 CONTAINER_PATH="${CONTAINER_PATH:-$DEFAULT_CONTAINER_PATH}"
 CONDA_ENV_NAME="${CONDA_ENV_NAME:-$DEFAULT_CONDA_ENV}"
 
-
-
-# === Prompt for resource preferences ===
+# Prompt for resource preferences
 printf '\033[1;34mPlease specify your Greene-compute resource request:\033[0m\n'
 read -p "Job duration in hours (default: ${TIME_HOURS:-1}): " input_time
 read -p "Slurm partition [eg: short, rtx8000, any] (default: $PARTITION): " input_partition
@@ -101,7 +99,6 @@ read -p "Container path (default: $CONTAINER_PATH): " input_container
 read -p "Conda environment name (default: $CONDA_ENV_NAME): " input_env
 printf '\n'
 
-
 # Apply only if user gave input
 [[ -n "$input_time" ]] && TIME_HOURS="$input_time"
 [[ -n "$input_partition" ]] && PARTITION="$input_partition"
@@ -113,7 +110,6 @@ printf '\n'
 [[ -n "$input_overlay" ]] && OVERLAY_PATH="$input_overlay"
 [[ -n "$input_container" ]] && CONTAINER_PATH="$input_container"
 [[ -n "$input_env" ]] && CONDA_ENV_NAME="$input_env"
-
 
 # Save for next session
 cat > "$PREFS_FILE" <<EOF
@@ -129,14 +125,14 @@ CONTAINER_PATH="$CONTAINER_PATH"
 CONDA_ENV_NAME="$CONDA_ENV_NAME"
 EOF
 
-
 # Convert RAM to SLURM format
 RAM_NUM=$(echo "$RAM" | sed 's/[Gg]//')
 RAM_MB=$(( RAM_NUM * 1000 ))
 
 
 
-# === Prepare request ===
+# === Prepare Request ===
+
 printf '\033[1;31mPreparing request...\033[0m\n'
 
 # Cancel leftover jobs and tunnels
@@ -163,12 +159,9 @@ EOF
 
 ssh greene-login "chmod +x \$HOME/.config/greene/launch_jupyter.sh"
 
-
 # Create and upload the entrypoint script
 printf 'Uploading entrypoint script\n'
 printf '\n'
-
-
 
 ssh greene-login "mkdir -p \$HOME/.config/greene && cat > \$HOME/.config/greene/job_script.sh" <<'EOF'
 #!/bin/bash
@@ -184,6 +177,7 @@ sleep infinity
 EOF
 
 ssh greene-login "chmod +x \$HOME/.config/greene/job_script.sh"
+
 
 
 # === Submit request ===
@@ -223,6 +217,9 @@ if [[ -z "$HOSTNAME" ]]; then
   exit 1
 fi
 
+
+# === Print Connection Info ===
+
 printf '\033[1;34mConnection info:\033[0m\n'  
 printf 'Node assigned: \033[1;33m%s\033[0m\n' "$HOSTNAME"
 ssh greene-login "rm -f .config/greene/last_node.txt"
@@ -248,10 +245,12 @@ END {
 }
 ' "$SSH_CONFIG" > "${SSH_CONFIG}.tmp" && mv "${SSH_CONFIG}.tmp" "$SSH_CONFIG"
 
-# Forward port from compute node to local
-sleep 20
+
+
+# === Forward Port from Compute Node to Local
 
 # Wait until Slurm confirms the node is ready
+sleep 20
 until ssh -o ConnectTimeout=2 greene-compute 'true' 2>/dev/null; do
     printf 'Waiting for greene-compute to accept SSH...\n'
     sleep 3
