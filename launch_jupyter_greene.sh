@@ -5,31 +5,6 @@ IFS=$'\n\t'
 clear
 
 
-
-# === Set Up Pushover ===
-
-# Set user key and API token
-
-export PUSHOVER_USER_KEY="uoq9wixd1ww2no8vem1kwnezhkd6cn"
-export PUSHOVER_API_TOKEN="adk7vvca5hdn5u2q7sksqaziv1pdqo"
-
-# Notification function
-
-pushover_notify() {
-    local message="$1"
-    if [[ -z "${PUSHOVER_USER_KEY:-}" || -z "${PUSHOVER_API_TOKEN:-}" ]]; then
-        printf '\033[1;31m[Pushover] PUSHOVER_USER_KEY or PUSHOVER_API_TOKEN not set. Skipping notification.\033[0m\n'
-        return
-    fi
-    curl -s --form-string "token=$PUSHOVER_API_TOKEN" \
-         --form-string "user=$PUSHOVER_USER_KEY" \
-         --form-string "message=$message" \
-         https://api.pushover.net/1/messages.json > /dev/null || \
-         printf '\033[1;31m[Pushover] Failed to send notification.\033[0m\n'
-}
-
-
-
 # === Cleanup On Abort ===
 
 cleanup() {
@@ -183,8 +158,6 @@ ssh greene-login "chmod +x \$HOME/.config/greene/job_script.sh"
 # === Submit request ===
 printf '\033[1;31mSubmitting request...\033[0m\n'
 
-pushover_notify "[Greene] Jupyter request submitted. Waiting for compute node..."
-
 # SSH into Greene, launch compute node, write hostname
 ssh greene-login "
   export OVERLAY_PATH='$OVERLAY_PATH'
@@ -274,9 +247,7 @@ done
 
 if [[ -n "$JUPYTER_URL" ]]; then
   printf '\n\033[1;32mAccess Jupyter kernel:\n\033[1;33m%s\033[0m\n\n' "$JUPYTER_URL"
-  pushover_notify "[Greene] Jupyter ready: $JUPYTER_URL"
 else
   printf '\n\033[1;31mFailed to retrieve Jupyter URL from log after 2 minutes.\033[0m\n'
-  pushover_notify "[Greene] Jupyter started, but URL not found in log."
 fi
 
