@@ -154,7 +154,7 @@ fi
 python -m ipykernel install --user \
   --name ${CONDA_ENV_NAME} \
   --display-name "Remote kernel: ${CONDA_ENV_NAME}"
-jupyter lab --no-browser --port=8888 --ip=0.0.0.0 --ServerApp.token=''
+jupyter lab --no-browser --port=8888 --ip=0.0.0.0
 EOF
 
 ssh greene-login "chmod +x \$HOME/.config/greene/launch_jupyter.sh"
@@ -261,8 +261,22 @@ printf 'Forwarding local port\n'
 ssh -N -L $LOCAL_PORT:localhost:$REMOTE_PORT greene-compute &
 PORT_FORWARD_PID=$!
 
-# Print access info and send notification after port forward starts
-printf 'Access Jupyter kernel: \033[1;33mhttp://127.0.0.1:%s/lab\033[0m\n' "$LOCAL_PORT"
-printf '\n'
+# === Parse Jupyter token from remote log
+printf 'Waiting for JupyterLab URL to appear in log...\n'
+JUPYTER_URL=""
+for i in {1..60}; do
+  JUPYTER_URL=$(ssh greene-compute "grep -o 'http://127.0.0.1:[0-9]\+/lab?token=[a-z0-9]\{48,\}' ~/.jupyter/jlab.log | tail -n 1") || true
+  if [[ -n "$JUPYTER_URL" ]]; then
+    break
+  fi
+  sleep 2
+done
 
-pushover_notify "[Greene] Jupyter request granted! Node: $HOSTNAME"
+if [[ -n "$JUPYTER_URL" ]]; then
+  printf '\n\033[1;32mAccess Jupyter kernel:\n\033[1;33m%s\033[0m\n\n' "$JUPYTER_URL"
+  pushover_notify "[Greene] Jupyter ready: $JUPYTER_URL"
+else
+  printf '\n\033[1;31mFailed to retrieve Jupyter URL from log after 2 minutes.\033[0m\n'
+  pushover_notify "[Greene] Jupyter started, but URL not found in log."
+fi
+
